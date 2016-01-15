@@ -1,13 +1,20 @@
 # SoapJavaConsumer
 
+
 Wait for 4 arguments :
+
 1. name of the unicast queue
+
 2. name of the exchange
+
 3. name of the broadcast queue
+
 4. name of the callback queue (in order to return data)
+
 
 Concerning the structure of the json files, the consumer is waiting for :
 
+```
 //config file to set all the paramaters for the sending of requests
 {
   "type" : "config",
@@ -22,3 +29,4 @@ Concerning the structure of the json files, the consumer is waiting for :
 {
   "type : "go"
 }
+```
