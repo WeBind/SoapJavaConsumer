@@ -172,7 +172,7 @@ public class SoapConsumer {
             time2 = System.currentTimeMillis();
             JSONObject sent = new JSONObject();
             sent.put("id", this.id + "-" + cpt);
-            sent.put("time", time1 - time4);
+            sent.put("time", String.valueOf(time1 - time4));
             JSONObject received = new JSONObject();
             received.put("id", this.id + "-" + cpt);
 
@@ -182,12 +182,12 @@ public class SoapConsumer {
             if(listReturn.getLength() != 0) {
             	byte[] result = listReturn.item(0).getTextContent().getBytes("UTF-8");
             	System.out.println("\nNumber of bytes received : " + result.length);
-                received.put("time", time2 - time4);
+                received.put("time", String.valueOf(time2 - time4));
             	
             } else {
             	System.out.println("\nThe request returned a fault");
             	cptFails++;
-            	received.put("time", -1);
+            	received.put("time", "-1");
             	received.put("error", soapResponse.getSOAPBody().getTextContent());
             }
             listSent.add(sent);
@@ -199,7 +199,7 @@ public class SoapConsumer {
             time3 = System.currentTimeMillis();
         }
         
-        data.put("errors", cptFails);
+        data.put("errors", String.valueOf(cptFails));
         data.put("sent", listSent);
         data.put("received", listReceived);
         this.channel.queueDeclare(this.callback, false, false, false, null);
