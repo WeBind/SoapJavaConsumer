@@ -52,8 +52,14 @@ public class SoapConsumer {
     private int duration;
     private int period;
     private String provider;
+    private Boolean endReceived;
+    private JSONObject data;
+    private JSONArray listSent;
+    private JSONArray listReceived;
+    private int cptFails;
 
-    public SoapConsumer(String id, String exchange, String broadcast, String callback)
+    @SuppressWarnings("unchecked")
+	public SoapConsumer(String id, String exchange, String broadcast, String callback)
     {
         this.id = id;
         this.exchange = exchange;
@@ -68,10 +74,17 @@ public class SoapConsumer {
         this.duration = 0;
         this.period = 0;
         this.provider = null;
+        this.endReceived = false;
+        this.data = new JSONObject();
+        this.data.put("id", this.id);
+        this.listSent = new JSONArray();
+        this.listReceived = new JSONArray();
+        this.cptFails = 0;
     }
 
     public void run () throws Exception
     {
+    	System.out.println("THREAD RUN : " + Thread.currentThread().getId());
         //new rabbitMQ connection
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
@@ -94,8 +107,10 @@ public class SoapConsumer {
         //create new consumer
         Consumer consumer = new DefaultConsumer(channel) {
             @Override
+            //Executed when a message is received
             public void handleDelivery(String consumerTag, Envelope envelope,
                                      AMQP.BasicProperties properties, byte[] body) throws IOException {
+            	System.out.println("THREAD HANDLE DELIVERY : " + Thread.currentThread().getId());
                 String message = new String(body, "UTF-8");
                 System.out.println(" [x] Received '" + envelope.getRoutingKey() + "':'" + message + "'");
                 JSONObject obj;
@@ -103,6 +118,7 @@ public class SoapConsumer {
                     obj = (JSONObject) parser.parse(message);
                     if (obj.containsKey("type")) {
                         String type = (String) obj.get("type");
+                        //if config message
                         if(type.equals("config")) {
                             if (obj.containsKey("startingTime"))
                                 setStartingTime(Integer.parseInt((String) obj.get("startingTime")));
@@ -115,21 +131,36 @@ public class SoapConsumer {
                             if (obj.containsKey("provider"))
                                 setProvider((String) obj.get("provider"));
                         } else {
+                        	//if go message
                             if(type.equals("go")) {
                                 try {
-                                    if(getProvider() == null)
-                                        disconnectEverything();
-                                    else
-                                        doStuff();
+                                    if(getProvider() == null) {
+                                        putData("error", "provider unknown");
+                                    } else {
+                                        doRequest();
+                                    }
                                 } catch (SOAPException ex) {
                                     Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, ex);
+                                    putData("error", "SOAPException");
                                 } catch (InterruptedException ex) {
                                     Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, ex);
+                                    putData("error", "InterruptedException");
                                 } catch (Exception ex) {
                                     Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, ex);
+                                    putData("error", "Exception");
                                 }
                             } else {
-                                System.out.println("[!] Last message was unreadable");
+                            	//if end message
+                            	if(type.equals("end")) {
+                            		if(getProvider() == null) {
+                                        disconnectEverything();
+                            		} else {
+                            			setEndReceived(true);
+                                        doCallback();
+                                    }
+                            	} else {
+                            		System.out.println("[!] Last message was unreadable");
+                            	}
                             }
                         }
                     } else {
@@ -144,16 +175,13 @@ public class SoapConsumer {
         this.channel.basicConsume(queueName, true, consumer);
     }
 
+    //Send requests to provider and store data
     @SuppressWarnings("unchecked") //http://stackoverflow.com/questions/2646613/how-to-avoid-eclipse-warnings-when-using-legacy-code-without-generics
-	public void doStuff() throws SOAPException, InterruptedException, Exception {
-        int cpt = 0, cptFails = 0;
+	private void doRequest() throws SOAPException, InterruptedException, Exception {
+    	System.out.println("THREAD DO REQUEST : " + Thread.currentThread().getId());
+        int cpt = 0;
         long time1, time2, time3, time4;
-        JSONObject data = new JSONObject();
-        data.put("id", this.id);
-        JSONArray listSent = new JSONArray();
-        JSONArray listReceived = new JSONArray();
         
-
         //new soap connection
         SOAPConnectionFactory soapFactory = SOAPConnectionFactory.newInstance();
         this.soapConnection = soapFactory.createConnection();
@@ -165,7 +193,7 @@ public class SoapConsumer {
         time3 = System.currentTimeMillis();
         time4 = System.currentTimeMillis();
 
-        while(time4 + this.duration > time3) {
+        while(time4 + this.duration > time3 && this.endReceived == false) {
             // Send SOAP Message to SOAP Web Service
             time1 = System.currentTimeMillis();
             SOAPMessage soapResponse = soapConnection.call(SoapMessageCreator.createSOAPRequest(), this.provider);
@@ -177,50 +205,58 @@ public class SoapConsumer {
             received.put("id", this.id + "-" + cpt);
 
             // Process the SOAP Response
-            SoapMessageCreator.printSOAPResponse(soapResponse);
+            //SoapMessageCreator.printSOAPResponse(soapResponse);
             NodeList listReturn = soapResponse.getSOAPBody().getElementsByTagName("return");
             if(listReturn.getLength() != 0) {
             	byte[] result = listReturn.item(0).getTextContent().getBytes("UTF-8");
-            	System.out.println("\nNumber of bytes received : " + result.length);
+            	//System.out.println("\nNumber of bytes received : " + result.length);
                 received.put("time", String.valueOf(time2 - time4));
             	
             } else {
-            	System.out.println("\nThe request returned a fault");
-            	cptFails++;
+            	//System.out.println("\nThe request returned a fault");
+            	this.cptFails++;
             	received.put("time", "-1");
             	received.put("error", soapResponse.getSOAPBody().getTextContent());
             }
-            listSent.add(sent);
-            listReceived.add(received);
-            System.out.println("Delay of call : " + (time2 - time1) + " ms");
+            this.listSent.add(sent);
+            this.listReceived.add(received);
+            //System.out.println("Delay of call : " + (time2 - time1) + " ms");
             //System.out.println("\nPeriod : Sleep for " + period + " ms");
             Thread.sleep(this.period);
             cpt++;
             time3 = System.currentTimeMillis();
         }
         
-        data.put("errors", String.valueOf(cptFails));
-        data.put("sent", listSent);
-        data.put("received", listReceived);
-        this.channel.queueDeclare(this.callback, false, false, false, null);
-        channel.basicPublish("", this.callback, null, data.toJSONString().getBytes());
-        System.out.println("\nMission executed : " + cpt + " requests in " + (time3 - time4) + " ms ==> " + cptFails + " fails");
-        
-        disconnectEverything();     
+        System.out.println("\nMission executed : " + cpt + " requests in " + (time3 - time4) + " ms ==> " + cptFails + " fails\n");  
     }
-
+    
+    //Send data to callback queue& disconnect
+    @SuppressWarnings("unchecked")
+	private void doCallback() throws IOException {
+        this.data.put("errors", String.valueOf(cptFails));
+        this.data.put("sent", listSent);
+        this.data.put("received", listReceived);
+        this.channel.queueDeclare(this.callback, false, false, false, null);
+        channel.basicPublish("", this.callback, null, this.data.toJSONString().getBytes());
+        this.disconnectEverything();
+    }
+    
+    //Disconnect soapConnection and queueConnection
     private void disconnectEverything() {
         try {
         	System.out.println("\nDisconnecting soap & rabbitmq");
-            this.soapConnection.close();
-            this.queueConnection.close();
+        	if(this.soapConnection != null)
+        		this.soapConnection.close();
+        	if(this.queueConnection != null)
+        		this.queueConnection.close();
         } catch (IOException ex) {
             Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SOAPException ex) {
             Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
+    //Main function
     public static void main(String[] args)
     {
         try {
@@ -269,5 +305,14 @@ public class SoapConsumer {
 
     public void setStartingTime(int startingTime) {
         this.startingTime = startingTime;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public void putData(String key, Object value) {
+        this.data.put(key, value);
+    }
+    
+    public void setEndReceived(Boolean endReceived) {
+        this.endReceived = endReceived;
     }
 }
