@@ -1,6 +1,6 @@
 package example;
 
-import java.io.UnsupportedEncodingException;
+//import java.io.UnsupportedEncodingException;
 
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.Name;
@@ -63,13 +63,13 @@ public class SoapMessageCreator {
         transformer.transform(sourceContent, result);
     }
 
-    private String generateMessage(int messageSize) throws UnsupportedEncodingException {
+    /*private String generateMessage(int messageSize) throws UnsupportedEncodingException {
         byte[] mess = new byte[messageSize];
         for(int i=0;i < messageSize;i++) {
             mess[i] =(byte) ('a' +(i%26));
         }
         
         return (new String(mess, "UTF_8"));
-    }
+    }*/
 
 }

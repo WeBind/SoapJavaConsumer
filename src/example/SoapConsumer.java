@@ -8,13 +8,12 @@ package example;
 
 import com.rabbitmq.client.AMQP;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.soap.SOAPException;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -45,6 +44,7 @@ public class SoapConsumer {
     private String broadcast;
     private String callback;
     private Connection queueConnection;
+    private Channel channel;
     private SOAPConnection soapConnection;
     private JSONParser parser;
     private int startingTime;
@@ -60,6 +60,7 @@ public class SoapConsumer {
         this.broadcast = broadcast;
         this.callback = callback;
         this.queueConnection = null;
+        this.channel = null;
         this.soapConnection = null;
         this.parser = new JSONParser();
         this.startingTime = 0;
@@ -75,17 +76,17 @@ public class SoapConsumer {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
         this.queueConnection = factory.newConnection();
-        Channel channel = queueConnection.createChannel();
+        this.channel = queueConnection.createChannel();
         
         // declare the exchange
-        channel.exchangeDeclare(this.exchange, "direct");
+        this.channel.exchangeDeclare(this.exchange, "direct");
 
         //declare the queue
         String queueName = channel.queueDeclare().getQueue();
         
         //bind the queue to the exchange (id + broadcast);
-        channel.queueBind(queueName, this.exchange, this.id);
-        channel.queueBind(queueName, this.exchange, this.broadcast);
+        this.channel.queueBind(queueName, this.exchange, this.id);
+        this.channel.queueBind(queueName, this.exchange, this.broadcast);
         
         //wait for orders message
         System.out.println(" [*] Waiting for orders.");
@@ -140,13 +141,18 @@ public class SoapConsumer {
             }
         };
 
-        channel.basicConsume(queueName, true, consumer);
+        this.channel.basicConsume(queueName, true, consumer);
     }
 
-    public void doStuff() throws SOAPException, InterruptedException, Exception {
+    @SuppressWarnings("unchecked") //http://stackoverflow.com/questions/2646613/how-to-avoid-eclipse-warnings-when-using-legacy-code-without-generics
+	public void doStuff() throws SOAPException, InterruptedException, Exception {
         int cpt = 0, cptFails = 0;
         long time1, time2, time3, time4;
-        ArrayList<SOAPMessage> listFails = new ArrayList<SOAPMessage>();
+        JSONObject data = new JSONObject();
+        data.put("id", this.id);
+        JSONArray listSent = new JSONArray();
+        JSONArray listReceived = new JSONArray();
+        
 
         //new soap connection
         SOAPConnectionFactory soapFactory = SOAPConnectionFactory.newInstance();
@@ -164,40 +170,48 @@ public class SoapConsumer {
             time1 = System.currentTimeMillis();
             SOAPMessage soapResponse = soapConnection.call(SoapMessageCreator.createSOAPRequest(), this.provider);
             time2 = System.currentTimeMillis();
+            JSONObject sent = new JSONObject();
+            sent.put("id", this.id + "-" + cpt);
+            sent.put("time", time1 - time4);
+            JSONObject received = new JSONObject();
+            received.put("id", this.id + "-" + cpt);
 
             // Process the SOAP Response
             SoapMessageCreator.printSOAPResponse(soapResponse);
-            NodeList list = soapResponse.getSOAPBody().getElementsByTagName("return");
-            if(list.getLength() != 0) {
-            	byte[] result = list.item(0).getTextContent().getBytes("UTF-8");
+            NodeList listReturn = soapResponse.getSOAPBody().getElementsByTagName("return");
+            if(listReturn.getLength() != 0) {
+            	byte[] result = listReturn.item(0).getTextContent().getBytes("UTF-8");
             	System.out.println("\nNumber of bytes received : " + result.length);
+                received.put("time", time2 - time4);
+            	
             } else {
             	System.out.println("\nThe request returned a fault");
             	cptFails++;
-            	listFails.add(soapResponse);
+            	received.put("time", -1);
+            	received.put("error", soapResponse.getSOAPBody().getTextContent());
             }
-            
+            listSent.add(sent);
+            listReceived.add(received);
             System.out.println("Delay of call : " + (time2 - time1) + " ms");
             //System.out.println("\nPeriod : Sleep for " + period + " ms");
             Thread.sleep(this.period);
             cpt++;
             time3 = System.currentTimeMillis();
         }
-
+        
+        data.put("errors", cptFails);
+        data.put("sent", listSent);
+        data.put("received", listReceived);
+        this.channel.queueDeclare(this.callback, false, false, false, null);
+        channel.basicPublish("", this.callback, null, data.toJSONString().getBytes());
         System.out.println("\nMission executed : " + cpt + " requests in " + (time3 - time4) + " ms ==> " + cptFails + " fails");
-        System.out.println("\nFails :");
-        Iterator<SOAPMessage> it = listFails.iterator();
-        while (it.hasNext()) {
-            SoapMessageCreator.printSOAPResponse(it.next());
-        }
-        disconnectEverything();
         
-        
+        disconnectEverything();     
     }
 
     private void disconnectEverything() {
         try {
-        	System.out.println("\n\nDisconnecting soap & rabbitmq");
+        	System.out.println("\nDisconnecting soap & rabbitmq");
             this.soapConnection.close();
             this.queueConnection.close();
         } catch (IOException ex) {
