@@ -8,6 +8,7 @@ package example;
 
 import com.rabbitmq.client.AMQP;
 
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -84,7 +85,6 @@ public class SoapConsumer {
 
     public void run () throws Exception
     {
-    	System.out.println("THREAD RUN : " + Thread.currentThread().getId());
         //new rabbitMQ connection
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
@@ -110,7 +110,6 @@ public class SoapConsumer {
             //Executed when a message is received
             public void handleDelivery(String consumerTag, Envelope envelope,
                                      AMQP.BasicProperties properties, byte[] body) throws IOException {
-            	System.out.println("THREAD HANDLE DELIVERY : " + Thread.currentThread().getId());
                 String message = new String(body, "UTF-8");
                 System.out.println(" [x] Received '" + envelope.getRoutingKey() + "':'" + message + "'");
                 JSONObject obj;
@@ -136,6 +135,7 @@ public class SoapConsumer {
                                 try {
                                     if(getProvider() == null) {
                                         putData("error", "provider unknown");
+                                        disconnectEverything();
                                     } else {
                                         doRequest();
                                     }
@@ -156,7 +156,6 @@ public class SoapConsumer {
                                         disconnectEverything();
                             		} else {
                             			setEndReceived(true);
-                                        doCallback();
                                     }
                             	} else {
                             		System.out.println("[!] Last message was unreadable");
@@ -178,7 +177,6 @@ public class SoapConsumer {
     //Send requests to provider and store data
     @SuppressWarnings("unchecked") //http://stackoverflow.com/questions/2646613/how-to-avoid-eclipse-warnings-when-using-legacy-code-without-generics
 	private void doRequest() throws SOAPException, InterruptedException, Exception {
-    	System.out.println("THREAD DO REQUEST : " + Thread.currentThread().getId());
         int cpt = 0;
         long time1, time2, time3, time4;
         
@@ -193,7 +191,7 @@ public class SoapConsumer {
         time3 = System.currentTimeMillis();
         time4 = System.currentTimeMillis();
 
-        while(time4 + this.duration > time3 && this.endReceived == false) {
+        while(time4 + this.duration > time3 && !this.endReceived) {
             // Send SOAP Message to SOAP Web Service
             time1 = System.currentTimeMillis();
             SOAPMessage soapResponse = soapConnection.call(SoapMessageCreator.createSOAPRequest(), this.provider);
@@ -205,29 +203,31 @@ public class SoapConsumer {
             received.put("id", this.id + "-" + cpt);
 
             // Process the SOAP Response
-            //SoapMessageCreator.printSOAPResponse(soapResponse);
+            SoapMessageCreator.printSOAPResponse(soapResponse);
             NodeList listReturn = soapResponse.getSOAPBody().getElementsByTagName("return");
             if(listReturn.getLength() != 0) {
-            	byte[] result = listReturn.item(0).getTextContent().getBytes("UTF-8");
-            	//System.out.println("\nNumber of bytes received : " + result.length);
+            	byte[] result = Base64.getDecoder().decode(listReturn.item(0).getTextContent());
+            	//byte[] result = listReturn.item(0).getTextContent().getBytes("UTF-8");
+            	System.out.println("\nNumber of bytes received : " + result.length);
                 received.put("time", String.valueOf(time2 - time4));
             	
             } else {
-            	//System.out.println("\nThe request returned a fault");
+            	System.out.println("\nThe request returned a fault");
             	this.cptFails++;
             	received.put("time", "-1");
             	received.put("error", soapResponse.getSOAPBody().getTextContent());
             }
             this.listSent.add(sent);
             this.listReceived.add(received);
-            //System.out.println("Delay of call : " + (time2 - time1) + " ms");
-            //System.out.println("\nPeriod : Sleep for " + period + " ms");
+            System.out.println("Delay of call : " + (time2 - time1) + " ms");
+            System.out.println("\nPeriod : Sleep for " + period + " ms");
             Thread.sleep(this.period);
             cpt++;
             time3 = System.currentTimeMillis();
         }
         
-        System.out.println("\nMission executed : " + cpt + " requests in " + (time3 - time4) + " ms ==> " + cptFails + " fails\n");  
+        System.out.println("\nMission executed : " + cpt + " requests in " + (time3 - time4) + " ms ==> " + cptFails + " fails\n");
+        doCallback();
     }
     
     //Send data to callback queue& disconnect

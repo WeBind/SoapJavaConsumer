@@ -45,8 +45,8 @@ public class SoapMessageCreator {
         soapMessage.saveChanges();
 
         /* Print the request message */
-        //System.out.print("\nRequest SOAP Message = ");
-        //soapMessage.writeTo(System.out);
+        System.out.print("\nRequest SOAP Message = ");
+        soapMessage.writeTo(System.out);
 
         return soapMessage;
     }
