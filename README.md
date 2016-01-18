@@ -30,3 +30,34 @@ Concerning the structure of the json files, the consumer is waiting for :
   "type : "go"
 }
 ```
+
+And it returns (on the callback queue) :
+
+```
+{
+  "id" : "cons1",
+  "errors" : "1";
+  "sent" : [
+              {
+                "id" : "cons1-0",
+                "time" : "70"
+              },
+              {
+                "id" : "cons1-1",
+                "time" : "1076"
+              }
+            ],
+  "received" : [
+                  {
+                    "id" : "cons1-0",
+                    "time" : "74",
+                  },
+                  {
+                    "id" : "cons1-1",
+                    "time" : "-1",
+                    "error" : "Timeout"
+                  }
+                ]
+  }
+```
+
