@@ -8,7 +8,7 @@ package example;
 
 import com.rabbitmq.client.AMQP;
 
-import java.util.Base64;
+import org.apache.commons.codec.binary.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -90,17 +90,17 @@ public class SoapConsumer {
         factory.setHost("localhost");
         this.queueConnection = factory.newConnection();
         this.channel = queueConnection.createChannel();
-        
+
         // declare the exchange
         this.channel.exchangeDeclare(this.exchange, "direct");
 
         //declare the queue
         String queueName = channel.queueDeclare().getQueue();
-        
+
         //bind the queue to the exchange (id + broadcast);
         this.channel.queueBind(queueName, this.exchange, this.id);
         this.channel.queueBind(queueName, this.exchange, this.broadcast);
-        
+
         //wait for orders message
         System.out.println(" [*] Waiting for orders.");
 
@@ -179,7 +179,7 @@ public class SoapConsumer {
 	private void doRequest() throws SOAPException, InterruptedException, Exception {
         int cpt = 0;
         long time1, time2, time3, time4;
-        
+
         //new soap connection
         SOAPConnectionFactory soapFactory = SOAPConnectionFactory.newInstance();
         this.soapConnection = soapFactory.createConnection();
@@ -206,11 +206,12 @@ public class SoapConsumer {
             SoapMessageCreator.printSOAPResponse(soapResponse);
             NodeList listReturn = soapResponse.getSOAPBody().getElementsByTagName("return");
             if(listReturn.getLength() != 0) {
-            	byte[] result = Base64.getDecoder().decode(listReturn.item(0).getTextContent());
+                Base64 decoder = new Base64();
+            	byte[] result = decoder.decode(listReturn.item(0).getTextContent());
             	//byte[] result = listReturn.item(0).getTextContent().getBytes("UTF-8");
             	System.out.println("\nNumber of bytes received : " + result.length);
                 received.put("time", String.valueOf(time2 - time4));
-            	
+
             } else {
             	System.out.println("\nThe request returned a fault");
             	this.cptFails++;
@@ -225,11 +226,11 @@ public class SoapConsumer {
             cpt++;
             time3 = System.currentTimeMillis();
         }
-        
+
         System.out.println("\nMission executed : " + cpt + " requests in " + (time3 - time4) + " ms ==> " + cptFails + " fails\n");
         doCallback();
     }
-    
+
     //Send data to callback queue& disconnect
     @SuppressWarnings("unchecked")
 	private void doCallback() throws IOException {
@@ -240,7 +241,7 @@ public class SoapConsumer {
         channel.basicPublish("", this.callback, null, this.data.toJSONString().getBytes());
         this.disconnectEverything();
     }
-    
+
     //Disconnect soapConnection and queueConnection
     private void disconnectEverything() {
         try {
@@ -255,7 +256,7 @@ public class SoapConsumer {
             Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     //Main function
     public static void main(String[] args)
     {
@@ -306,12 +307,12 @@ public class SoapConsumer {
     public void setStartingTime(int startingTime) {
         this.startingTime = startingTime;
     }
-    
+
     @SuppressWarnings("unchecked")
 	public void putData(String key, Object value) {
         this.data.put(key, value);
     }
-    
+
     public void setEndReceived(Boolean endReceived) {
         this.endReceived = endReceived;
     }

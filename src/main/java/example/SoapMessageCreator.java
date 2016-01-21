@@ -68,7 +68,7 @@ public class SoapMessageCreator {
         for(int i=0;i < messageSize;i++) {
             mess[i] =(byte) ('a' +(i%26));
         }
-        
+
         return (new String(mess, "UTF_8"));
     }*/
 
