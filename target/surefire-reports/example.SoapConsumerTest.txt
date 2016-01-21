@@ -1,0 +1,9 @@
+-------------------------------------------------------------------------------
+Test set: example.SoapConsumerTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.129 sec <<< FAILURE!
+testMain(example.SoapConsumerTest)  Time elapsed: 0.03 sec  <<< FAILURE!
+junit.framework.AssertionFailedError: The test case is a prototype.
+	at junit.framework.Assert.fail(Assert.java:47)
+	at example.SoapConsumerTest.testMain(SoapConsumerTest.java:49)
+

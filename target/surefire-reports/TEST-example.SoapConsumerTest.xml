@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite failures="1" time="0.04" errors="0" skipped="0" tests="1" name="example.SoapConsumerTest">
+  <properties>
+    <property name="java.vendor" value="Sun Microsystems Inc."/>
+    <property name="localRepository" value="C:\Users\Adirael\.m2\repository"/>
+    <property name="env.USERDOMAIN_ROAMINGPROFILE" value="Mike"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Server Compiler"/>
+    <property name="env.PROMPT" value="$P$G"/>
+    <property name="os.name" value="Windows Vista"/>
+    <property name="env.FP_NO_HOST_CHECK" value="NO"/>
+    <property name="sun.boot.class.path" value="C:\Program Files\Java\jdk1.6.0\jre\lib\resources.jar;C:\Program Files\Java\jdk1.6.0\jre\lib\rt.jar;C:\Program Files\Java\jdk1.6.0\jre\lib\sunrsasign.jar;C:\Program Files\Java\jdk1.6.0\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.6.0\jre\lib\jce.jar;C:\Program Files\Java\jdk1.6.0\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.6.0\jre\classes"/>
+    <property name="env.COMPUTERNAME" value="MIKE"/>
+    <property name="env.CommonProgramW6432" value="C:\Program Files\Common Files"/>
+    <property name="env.ALLUSERSPROFILE" value="C:\ProgramData"/>
+    <property name="sun.desktop" value="windows"/>
+    <property name="java.vm.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="java.runtime.version" value="1.6.0-b105"/>
+    <property name="env.HOMEPATH" value="\Users\Adirael"/>
+    <property name="user.name" value="Adirael"/>
+    <property name="nb.show.statistics.ui" value="usageStatisticsEnabled"/>
+    <property name="user.language" value="es"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk1.6.0\jre\bin"/>
+    <property name="java.version" value="1.6.0"/>
+    <property name="env.PROCESSOR_IDENTIFIER" value="Intel64 Family 6 Model 58 Stepping 9, GenuineIntel"/>
+    <property name="env.ERLANG_HOME" value="C:\Program Files\erl7.1"/>
+    <property name="user.timezone" value="Europe/Paris"/>
+    <property name="env.TEMP" value="C:\Users\Adirael\AppData\Local\Temp"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="http.nonProxyHosts" value="localhost|127.0.0.1|Mike"/>
+    <property name="java.endorsed.dirs" value="C:\Program Files\Java\jdk1.6.0\jre\lib\endorsed"/>
+    <property name="com.sun.aas.installRoot" value="C:\GlassFishESBv22\glassfish"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="env.HOMEDRIVE" value="C:"/>
+    <property name="sun.jnu.encoding" value="Cp1252"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="file.separator" value="\"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.class.version" value="50.0"/>
+    <property name="user.country" value="MX"/>
+    <property name="java.home" value="C:\Program Files\Java\jdk1.6.0\jre"/>
+    <property name="env.PSModulePath" value="C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules\"/>
+    <property name="env.APPDATA" value="C:\Users\Adirael\AppData\Roaming"/>
+    <property name="env.PUBLIC" value="C:\Users\Public"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="nb.registration.enabled" value="false"/>
+    <property name="env.ComSpec" value="C:\WINDOWS\system32\cmd.exe"/>
+    <property name="env.OS" value="Windows_NT"/>
+    <property name="env.CommonProgramFiles" value="C:\Program Files\Common Files"/>
+    <property name="os.version" value="6.2"/>
+    <property name="netbeans.system_http_proxy" value="DIRECT"/>
+    <property name="env.ProgramW6432" value="C:\Program Files"/>
+    <property name="env.configsetroot" value="C:\WINDOWS\ConfigSetRoot"/>
+    <property name="https.nonProxyHosts" value="localhost|127.0.0.1|Mike"/>
+    <property name="sun.awt.keepWorkingSetOnMinimize" value="true"/>
+    <property name="path.separator" value=";"/>
+    <property name="java.vm.version" value="1.6.0-b105"/>
+    <property name="env.USERPROFILE" value="C:\Users\Adirael"/>
+    <property name="user.variant" value=""/>
+    <property name="env.JAVA_HOME" value="C:\Program Files\Java\jdk1.8.0_60"/>
+    <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob"/>
+    <property name="env.TMP" value="C:\Users\Adirael\AppData\Local\Temp"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="awt.toolkit" value="sun.awt.windows.WToolkit"/>
+    <property name="env.JAVA_HOME2" value="C:\Program Files\Java\jdk1.6.0"/>
+    <property name="env.DOCKER_TOOLBOX_INSTALL_PATH" value="C:\Program Files\Docker Toolbox"/>
+    <property name="useJavaUtilZip" value="true"/>
+    <property name="user.home" value="C:\Users\Adirael"/>
+    <property name="env.ProgramData" value="C:\ProgramData"/>
+    <property name="env.VS140COMNTOOLS" value="C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\"/>
+    <property name="env.SESSIONNAME" value="Console"/>
+    <property name="env.ProgramFiles(x86)" value="C:\Program Files (x86)"/>
+    <property name="java.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="test" value="SoapConsumerTest"/>
+    <property name="apple.laf.useScreenMenuBar" value="true"/>
+    <property name="org.xml.sax.driver" value="com.sun.org.apache.xerces.internal.jaxp.SAXParserImpl$JAXPSAXParser"/>
+    <property name="env.M2_HOME" value="C:\Users\Adirael\Documents\Universidad\INSA\Maven\apache-maven-3.3.9"/>
+    <property name="java.vendor.url" value="http://java.sun.com/"/>
+    <property name="java.library.path" value="C:\Program Files\Java\jdk1.6.0\jre\bin;.;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\ProgramData\Oracle\Java\javapath;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Windows Live\Shared;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\Intel\OpenCL SDK\2.0\bin\x86;C:\Program Files (x86)\Intel\OpenCL SDK\2.0\bin\x64;C:\Program Files\Intel\WiFi\bin\;C:\Program Files\Common Files\Intel\WirelessCommon\;C:\WINDOWS\system32\config\systemprofile\.dnx\bin;C:\Program Files\Microsoft DNX\Dnvm\;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;C:\Program Files\Java\jdk1.8.0_60\bin;C:\Users\Adirael\AppData\Local\Android\android-sdk\platform-tools;C:\Users\Adirael\AppData\Local\Android\android-sdk\build-tools;C:\Program Files (x86)\CloudFoundry;c:\Program Files\Git\bin;C:\Program Files\Perforce;C:\Program Files\OpenVPN\bin;C:\Users\Adirael\Documents\Universidad\INSA\Maven\apache-maven-3.3.9\bin;C:\Users\Adirael\Documents\Universidad\INSA\ANT\apache-ant-1.9.6\bin;C:\Windows\System32"/>
+    <property name="env.NUMBER_OF_PROCESSORS" value="8"/>
+    <property name="java.vm.vendor" value="Sun Microsystems Inc."/>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="java.class.path" value="C:\GlassFishESBv22\netbeans\platform10\lib\boot.jar;C:\GlassFishESBv22\netbeans\platform10\lib\org-openide-modules.jar;C:\GlassFishESBv22\netbeans\platform10\lib\org-openide-util.jar;C:\Program Files\Java\jdk1.6.0\lib\dt.jar;C:\Program Files\Java\jdk1.6.0\lib\tools.jar"/>
+    <property name="netbeans.derby.system.home" value="C:\GlassFishESBv22\glassfish\databases"/>
+    <property name="sun.java2d.noddraw" value="true"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="jdk.home" value="C:\Program Files\Java\jdk1.6.0"/>
+    <property name="env.windir" value="C:\WINDOWS"/>
+    <property name="env.LOGONSERVER" value="\\MIKE"/>
+    <property name="org.openide.specification.version" value="6.2"/>
+    <property name="java.vm.specification.version" value="1.0"/>
+    <property name="env.PROCESSOR_ARCHITECTURE" value="AMD64"/>
+    <property name="org.netbeans.core.startup.specialResource" value="nullcom.sun.jdo.api.persistence.mapping.ejb"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="env.ProgramFiles" value="C:\Program Files"/>
+    <property name="surefire.test.class.path" value="C:\Users\Adirael\Documents\NetBeansProjects\SoapJavaConsumer\target\test-classes;C:\Users\Adirael\Documents\NetBeansProjects\SoapJavaConsumer\target\classes;C:\Users\Adirael\.m2\repository\commons-codec\commons-codec\1.9\commons-codec-1.9.jar;C:\Users\Adirael\.m2\repository\com\googlecode\json-simple\json-simple\1.1\json-simple-1.1.jar;C:\Users\Adirael\.m2\repository\javax\ws\rs\javax.ws.rs-api\2.0\javax.ws.rs-api-2.0.jar;C:\Users\Adirael\.m2\repository\asm\asm\3.3.1\asm-3.3.1.jar;C:\Users\Adirael\.m2\repository\com\rabbitmq\amqp-client\3.6.0\amqp-client-3.6.0.jar;C:\Users\Adirael\.m2\repository\org\codehaus\jettison\jettison\1.3.7\jettison-1.3.7.jar;C:\Users\Adirael\.m2\repository\stax\stax-api\1.0.1\stax-api-1.0.1.jar;C:\Users\Adirael\.m2\repository\com\google\code\gson\gson\2.5\gson-2.5.jar;C:\Users\Adirael\.m2\repository\javax\servlet\servlet-api\2.5\servlet-api-2.5.jar;C:\Users\Adirael\.m2\repository\javax\servlet\jsp\jsp-api\2.1\jsp-api-2.1.jar;C:\Users\Adirael\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;"/>
+    <property name="java.io.tmpdir" value="C:\Users\Adirael\AppData\Local\Temp\"/>
+    <property name="env.PROCESSOR_REVISION" value="3a09"/>
+    <property name="env.CommonProgramFiles(x86)" value="C:\Program Files (x86)\Common Files"/>
+    <property name="java.vendor.url.bug" value="http://java.sun.com/cgi-bin/bugreport.cgi"/>
+    <property name="env.SystemRoot" value="C:\WINDOWS"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.ext.dirs" value="C:\Program Files\Java\jdk1.6.0\jre\lib\ext;C:\WINDOWS\Sun\Java\lib\ext"/>
+    <property name="user.dir" value="C:\Users\Adirael\Documents\NetBeansProjects\SoapJavaConsumer"/>
+    <property name="env.LOCALAPPDATA" value="C:\Users\Adirael\AppData\Local"/>
+    <property name="env.MAVEN_HOME" value="C:\Users\Adirael\Documents\Universidad\INSA\Maven\apache-maven-3.3.9"/>
+    <property name="line.separator" value="
+"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="env.PATHEXT" value=".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC"/>
+    <property name="env.Path" value="C:\ProgramData\Oracle\Java\javapath;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Windows Live\Shared;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\Intel\OpenCL SDK\2.0\bin\x86;C:\Program Files (x86)\Intel\OpenCL SDK\2.0\bin\x64;C:\Program Files\Intel\WiFi\bin\;C:\Program Files\Common Files\Intel\WirelessCommon\;C:\WINDOWS\system32\config\systemprofile\.dnx\bin;C:\Program Files\Microsoft DNX\Dnvm\;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;C:\Program Files\Java\jdk1.8.0_60\bin;C:\Users\Adirael\AppData\Local\Android\android-sdk\platform-tools;C:\Users\Adirael\AppData\Local\Android\android-sdk\build-tools;C:\Program Files (x86)\CloudFoundry;c:\Program Files\Git\bin;C:\Program Files\Perforce;C:\Program Files\OpenVPN\bin;C:\Users\Adirael\Documents\Universidad\INSA\Maven\apache-maven-3.3.9\bin;C:\Users\Adirael\Documents\Universidad\INSA\ANT\apache-ant-1.9.6\bin;C:\Windows\System32"/>
+    <property name="basedir" value="C:\Users\Adirael\Documents\NetBeansProjects\SoapJavaConsumer"/>
+    <property name="maven.mode.standalone" value="true"/>
+    <property name="env.USERNAME" value="Adirael"/>
+    <property name="env.SystemDrive" value="C:"/>
+    <property name="file.encoding" value="Cp1252"/>
+    <property name="netbeans.execution" value="true"/>
+    <property name="env.USERDOMAIN" value="Mike"/>
+    <property name="java.specification.version" value="1.6"/>
+    <property name="env.VBOX_MSI_INSTALL_PATH" value="C:\Program Files\Oracle\VirtualBox\"/>
+    <property name="env.PROCESSOR_LEVEL" value="6"/>
+  </properties>
+  <testcase time="0.028" classname="example.SoapConsumerTest" name="testMain">
+    <failure message="The test case is a prototype." type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: The test case is a prototype.
+	at junit.framework.Assert.fail(Assert.java:47)
+	at example.SoapConsumerTest.testMain(SoapConsumerTest.java:49)
+</failure>
+    <system-out>main
+</system-out>
+    <system-err>21/01/2016 06:35:05 PM example.SoapConsumer main
+GRAVE: null
+java.lang.NullPointerException
+	at example.SoapConsumer.main(SoapConsumer.java:264)
+	at example.SoapConsumerTest.testMain(SoapConsumerTest.java:47)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:597)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:597)
+	at org.apache.maven.surefire.junit.JUnitTestSet.execute(JUnitTestSet.java:213)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.executeTestSet(AbstractDirectoryTestSuite.java:140)
+	at org.apache.maven.surefire.suite.AbstractDirectoryTestSuite.execute(AbstractDirectoryTestSuite.java:127)
+	at org.apache.maven.surefire.Surefire.run(Surefire.java:177)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:597)
+	at org.apache.maven.surefire.booter.SurefireBooter.runSuitesInProcess(SurefireBooter.java:338)
+	at org.apache.maven.surefire.booter.SurefireBooter.main(SurefireBooter.java:997)
+</system-err>
+  </testcase>
+</testsuite>
