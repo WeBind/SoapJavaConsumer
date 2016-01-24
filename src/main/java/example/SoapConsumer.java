@@ -177,6 +177,9 @@ public class SoapConsumer {
     //Send requests to provider and store data
     @SuppressWarnings("unchecked") //http://stackoverflow.com/questions/2646613/how-to-avoid-eclipse-warnings-when-using-legacy-code-without-generics
 	private void doRequest() throws SOAPException, InterruptedException, Exception {
+	time3 = System.currentTimeMillis();
+        time4 = System.currentTimeMillis();
+        
         int cpt = 0;
         long time1, time2, time3, time4;
 
@@ -188,10 +191,9 @@ public class SoapConsumer {
         System.out.println("Starting time : Sleep for " + this.startingTime + " ms\n");
         Thread.sleep(startingTime);
 
-        time3 = System.currentTimeMillis();
-        time4 = System.currentTimeMillis();
+        
 
-        while(time4 + this.duration > time3 && !this.endReceived) {
+        while(time4 + this.duration + this.startingTime > time3 && !this.endReceived) {
             // Send SOAP Message to SOAP Web Service
             time1 = System.currentTimeMillis();
             SOAPMessage soapResponse = soapConnection.call(SoapMessageCreator.createSOAPRequest(), this.provider);
