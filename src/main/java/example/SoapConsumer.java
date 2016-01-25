@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package main.java.example;
+package example;
 
 
 import com.rabbitmq.client.AMQP;
