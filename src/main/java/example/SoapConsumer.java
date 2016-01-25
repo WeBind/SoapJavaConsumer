@@ -3,12 +3,14 @@
  * and open the template in the editor.
  */
 
-package example;
+package main.java.example;
 
 
 import com.rabbitmq.client.AMQP;
 
 import org.apache.commons.codec.binary.Base64;
+
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +34,7 @@ import javax.xml.soap.SOAPConnectionFactory;
 import javax.xml.soap.SOAPMessage;
 
 import org.json.simple.parser.ParseException;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.NodeList;
 
 /**
@@ -48,10 +51,10 @@ public class SoapConsumer {
     private Channel channel;
     private SOAPConnection soapConnection;
     private JSONParser parser;
-    private int startingTime;
-    private int size;
-    private int duration;
-    private int period;
+    private long startingTime;
+    private long size;
+    private long duration;
+    private long period;
     private String provider;
     private Boolean endReceived;
     private JSONObject data;
@@ -85,7 +88,7 @@ public class SoapConsumer {
         this.lg = java.util.logging.Logger.getLogger("SoapConsumer");
     }
 
-    public void run () throws Exception
+    public void run () throws IOException, TimeoutException
     {
         //new rabbitMQ connection
         ConnectionFactory factory = new ConnectionFactory();
@@ -122,35 +125,25 @@ public class SoapConsumer {
                         //if config message
                         if(type.equals("config")) {
                             if (obj.containsKey("startingTime"))
-                                setStartingTime(((Long) obj.get("startingTime")).intValue());
+                                setStartingTime((Long) obj.get("startingTime"));
                             if (obj.containsKey("size"))
-                                setSize(((Long) obj.get("size")).intValue());
+                                setSize((Long) obj.get("size"));
                             if (obj.containsKey("duration"))
-                                setDuration(((Long) obj.get("duration")).intValue());
+                                setDuration((Long) obj.get("duration"));
                             if (obj.containsKey("period"))
-                                setPeriod(((Long) obj.get("period")).intValue());
+                                setPeriod((Long) obj.get("period"));
                             if (obj.containsKey("provider"))
-                                setProvider( "http://192.168.0.105:8084/petals/services/SoapProvider" + obj.get("provider") + "?wsdl");
+                            	setProvider((String) obj.get("provider"));
+                                //setProvider( "http://192.168.0.105:8084/petals/services/SoapProvider" + obj.get("provider") + "?wsdl");
                         } else {
                         	//if go message
                             if(type.equals("go")) {
-                                try {
                                     if(getProvider() == null) {
                                         putData("error", "provider unknown");
                                         disconnectEverything();
                                     } else {
                                         doRequest();
                                     }
-                                } catch (SOAPException ex) {
-                                    Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, ex);
-                                    putData("error", "SOAPException");
-                                } catch (InterruptedException ex) {
-                                    Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, ex);
-                                    putData("error", "InterruptedException");
-                                } catch (Exception ex) {
-                                    Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, ex);
-                                    putData("error", "Exception");
-                                }
                             } else {
                             	//if end message
                             	if(type.equals("end")) {
@@ -178,7 +171,7 @@ public class SoapConsumer {
 
     //Send requests to provider and store data
     @SuppressWarnings("unchecked") //http://stackoverflow.com/questions/2646613/how-to-avoid-eclipse-warnings-when-using-legacy-code-without-generics
-    private void doRequest() throws SOAPException, InterruptedException, Exception {
+    private void doRequest() {
         int cpt = 0;
         long time1, time2, time3, time4;
         
@@ -186,62 +179,101 @@ public class SoapConsumer {
         time4 = System.currentTimeMillis();
 
         //new soap connection
-        SOAPConnectionFactory soapFactory = SOAPConnectionFactory.newInstance();
-        this.soapConnection = soapFactory.createConnection();
+        SOAPConnectionFactory soapFactory;
+		try {
+			soapFactory = SOAPConnectionFactory.newInstance();
+			this.soapConnection = soapFactory.createConnection();
+		} catch (UnsupportedOperationException | SOAPException e) {
+			Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, e);
+			this.endReceived = true;
+			this.data.put("exception", "SOAP connection exception : " + e);
+		}
+        
 
         //sleep waiting for the starting time
         lg.log(Level.INFO, "[" + id + "] sleep for " + this.startingTime + " ms : starting delay" );
-        Thread.sleep(startingTime);
+        try {
+			Thread.sleep(startingTime);
+		} catch (InterruptedException e) {
+			Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, e);
+			this.endReceived = true;
+			this.data.put("exception", "Thread sleep exception : " + e);
+		}
 
         
-
-        while(time4 + this.duration + this.startingTime > time3 && !this.endReceived) {
-            // Send SOAP Message to SOAP Web Service
-            time1 = System.currentTimeMillis();
-            SOAPMessage soapResponse = soapConnection.call(SoapMessageCreator.createSOAPRequest(), this.provider);
-            time2 = System.currentTimeMillis();
-            JSONObject sent = new JSONObject();
-            sent.put("id", this.id + "-" + cpt);
-            sent.put("time", String.valueOf(time1 - time4));
-            JSONObject received = new JSONObject();
-            received.put("id", this.id + "-" + cpt);
-
-            // Process the SOAP Response
-            //SoapMessageCreator.printSOAPResponse(soapResponse);
-            NodeList listReturn = soapResponse.getSOAPBody().getElementsByTagName("return");
-            if(listReturn.getLength() != 0) {
-                Base64 decoder = new Base64();
-            	byte[] result = decoder.decode(listReturn.item(0).getTextContent());
-            	//byte[] result = listReturn.item(0).getTextContent().getBytes("UTF-8");
-            	lg.log(Level.INFO, "[" + id + "] number of bytes received : " + result.length);
-                received.put("time", String.valueOf(time2 - time4));
-
-            } else {
-            	lg.log(Level.INFO, "[" + id + "] the last request returned a fault");
-            	this.cptFails++;
-            	received.put("time", "-1");
-            	received.put("error", soapResponse.getSOAPBody().getTextContent());
-            }
-            this.listSent.add(sent);
-            this.listReceived.add(received);
-            lg.log(Level.INFO, "[" + id + "] delay of request : " + (time2 - time1) + " ms");
-            lg.log(Level.INFO, "[" + id + "] sleep for " + period + "ms : period");
-            Thread.sleep(this.period);
-            cpt++;
-            time3 = System.currentTimeMillis();
-        }
-        lg.log(Level.INFO, "[" + id + "] mission executed : " + cpt + " requests in " + (time3 - time4) + " ms ==> " + cptFails + " fails");
+        try {
+	        while(time4 + this.duration + this.startingTime > time3 && !this.endReceived) {
+	            // Send SOAP Message to SOAP Web Service
+	            time1 = System.currentTimeMillis();
+	            SOAPMessage soapResponse = null;
+				
+				soapResponse = soapConnection.call(SoapMessageCreator.createSOAPRequest(), this.provider);
+	            time2 = System.currentTimeMillis();
+	            JSONObject sent = new JSONObject();
+	            sent.put("id", this.id + "-" + cpt);
+	            sent.put("time", String.valueOf(time1 - time4));
+	            JSONObject received = new JSONObject();
+	            received.put("id", this.id + "-" + cpt);
+	
+	            // Process the SOAP Response
+	            //SoapMessageCreator.printSOAPResponse(soapResponse);
+	            NodeList listReturn = null;
+					listReturn = soapResponse.getSOAPBody().getElementsByTagName("return");
+	            if(listReturn.getLength() != 0) {
+	                Base64 decoder = new Base64();
+	            	byte[] result = decoder.decode(listReturn.item(0).getTextContent());
+	            	//byte[] result = listReturn.item(0).getTextContent().getBytes("UTF-8");
+	            	lg.log(Level.INFO, "[" + id + "] number of bytes received : " + result.length);
+	                received.put("time", String.valueOf(time2 - time4));
+	
+	            } else {
+	            	lg.log(Level.INFO, "[" + id + "] the last request returned a fault");
+	            	this.cptFails++;
+	            	received.put("time", "-1");
+	            	try {
+						received.put("error", soapResponse.getSOAPBody().getTextContent());
+					} catch (DOMException | SOAPException e) {
+						Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, e);
+						this.endReceived = true;
+						this.data.put("exception", "SOAP response exception : " + e);
+					}
+	            }
+	            this.listSent.add(sent);
+	            this.listReceived.add(received);
+	            lg.log(Level.INFO, "[" + id + "] delay of request : " + (time2 - time1) + " ms");
+	            lg.log(Level.INFO, "[" + id + "] sleep for " + period + "ms : period");
+	            try {
+					Thread.sleep(this.period);
+				} catch (InterruptedException e) {
+					Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, e);
+					this.endReceived = true;
+					this.data.put("exception", "Thread sleep exception : " + e);
+				}
+	            cpt++;
+	            time3 = System.currentTimeMillis();
+	        }
+		} catch (Exception e) {
+			//Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, e);
+			this.endReceived = true;
+			this.data.put("exception", "SOAP call exception : " + e);
+		}
+        lg.log(Level.INFO, "[" + id + "] mission executed : " + cpt + " requests in " + (time3 - time4 - this.startingTime) + " ms ==> " + cptFails + " fails");
         doCallback();
     }
 
     //Send data to callback queue& disconnect
     @SuppressWarnings("unchecked")
-	private void doCallback() throws IOException {
+	private void doCallback() {
         this.data.put("errors", String.valueOf(cptFails));
         this.data.put("sent", listSent);
         this.data.put("received", listReceived);
-        this.channel.queueDeclare(this.callback, false, false, false, null);
-        channel.basicPublish("", this.callback, null, this.data.toJSONString().getBytes());
+        try {
+			this.channel.queueDeclare(this.callback, false, false, false, null);
+	        channel.basicPublish("", this.callback, null, this.data.toJSONString().getBytes());
+		} catch (IOException e) {
+			Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, e);
+		}
+        
         this.disconnectEverything();
     }
 
@@ -271,19 +303,19 @@ public class SoapConsumer {
         }
     }
 
-    public int getDuration() {
+    public long getDuration() {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 
-    public float getPeriod() {
+    public long getPeriod() {
         return period;
     }
 
-    public void setPeriod(int period) {
+    public void setPeriod(long period) {
         this.period = period;
     }
 
@@ -295,19 +327,19 @@ public class SoapConsumer {
         this.provider = provider;
     }
 
-    public int getSize() {
+    public long getSize() {
         return size;
     }
 
-    public void setSize(int size) {
+    public void setSize(long size) {
         this.size = size;
     }
 
-    public int getStartingTime() {
+    public long getStartingTime() {
         return startingTime;
     }
 
-    public void setStartingTime(int startingTime) {
+    public void setStartingTime(long startingTime) {
         this.startingTime = startingTime;
     }
 

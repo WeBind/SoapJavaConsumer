@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package example;
+package test.java.example;
 
 import junit.framework.TestCase;
 
