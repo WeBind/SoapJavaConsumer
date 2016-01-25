@@ -133,7 +133,7 @@ public class SoapConsumer {
                             if (obj.containsKey("period"))
                                 setPeriod((Long) obj.get("period"));
                             if (obj.containsKey("provider"))
-                                setProvider( "http://192.168.0.105:8084/petals/services/SoapProvider" + obj.get("provider") + "?wsdl");
+                                setProvider( "http://192.168.0.105:8084/petals/services/SoapProvider" + ((String) obj.get("provider")) + "?wsdl");
                         } else {
                         	//if go message
                             if(type.equals("go")) {
