@@ -176,12 +176,12 @@ public class SoapConsumer {
 
     //Send requests to provider and store data
     @SuppressWarnings("unchecked") //http://stackoverflow.com/questions/2646613/how-to-avoid-eclipse-warnings-when-using-legacy-code-without-generics
-	private void doRequest() throws SOAPException, InterruptedException, Exception {
-	time3 = System.currentTimeMillis();
-        time4 = System.currentTimeMillis();
-        
+    private void doRequest() throws SOAPException, InterruptedException, Exception {
         int cpt = 0;
         long time1, time2, time3, time4;
+        
+        time3 = System.currentTimeMillis();
+        time4 = System.currentTimeMillis();
 
         //new soap connection
         SOAPConnectionFactory soapFactory = SOAPConnectionFactory.newInstance();
