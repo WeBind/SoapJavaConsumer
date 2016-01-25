@@ -122,13 +122,13 @@ public class SoapConsumer {
                         //if config message
                         if(type.equals("config")) {
                             if (obj.containsKey("startingTime"))
-                                setStartingTime((Integer) obj.get("startingTime"));
+                                setStartingTime(((Long) obj.get("startingTime")).intValue());
                             if (obj.containsKey("size"))
-                                setSize((Integer) obj.get("size"));
+                                setSize(((Long) obj.get("size")).intValue());
                             if (obj.containsKey("duration"))
-                                setDuration((Integer) obj.get("duration"));
+                                setDuration(((Long) obj.get("duration")).intValue());
                             if (obj.containsKey("period"))
-                                setPeriod((Integer) obj.get("period"));
+                                setPeriod(((Long) obj.get("period")).intValue());
                             if (obj.containsKey("provider"))
                                 setProvider( "http://192.168.0.105:8084/petals/services/SoapProvider" + obj.get("provider") + "?wsdl");
                         } else {
