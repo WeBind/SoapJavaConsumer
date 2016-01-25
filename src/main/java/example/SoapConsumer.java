@@ -122,15 +122,15 @@ public class SoapConsumer {
                         //if config message
                         if(type.equals("config")) {
                             if (obj.containsKey("startingTime"))
-                                setStartingTime(Integer.parseInt((String) obj.get("startingTime")));
+                                setStartingTime((Integer) obj.get("startingTime"));
                             if (obj.containsKey("size"))
-                                setSize(Integer.parseInt((String) obj.get("size")));
+                                setSize((Integer) obj.get("size"));
                             if (obj.containsKey("duration"))
-                                setDuration(Integer.parseInt((String) obj.get("duration")));
+                                setDuration((Integer) obj.get("duration"));
                             if (obj.containsKey("period"))
-                                setPeriod(Integer.parseInt((String) obj.get("period")));
+                                setPeriod((Integer) obj.get("period"));
                             if (obj.containsKey("provider"))
-                                setProvider( "http://192.168.0.105:8084/petals/services/SoapProvider" + (String) obj.get("provider") + "?wsdl");
+                                setProvider( "http://192.168.0.105:8084/petals/services/SoapProvider" + obj.get("provider") + "?wsdl");
                         } else {
                         	//if go message
                             if(type.equals("go")) {
