@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package example;
+package main.java.example;
 
 
 import com.rabbitmq.client.AMQP;
@@ -58,6 +58,7 @@ public class SoapConsumer {
     private JSONArray listSent;
     private JSONArray listReceived;
     private int cptFails;
+    private Logger lg;
 
     @SuppressWarnings("unchecked")
 	public SoapConsumer(String id, String exchange, String broadcast, String callback)
@@ -81,6 +82,7 @@ public class SoapConsumer {
         this.listSent = new JSONArray();
         this.listReceived = new JSONArray();
         this.cptFails = 0;
+        this.lg = java.util.logging.Logger.getLogger("SoapConsumer");
     }
 
     public void run () throws Exception
@@ -102,7 +104,7 @@ public class SoapConsumer {
         this.channel.queueBind(queueName, this.exchange, this.broadcast);
 
         //wait for orders message
-        System.out.println(" [*] Waiting for orders.");
+        lg.log(Level.INFO, "[" + id + "] listening to queue for orders");
 
         //create new consumer
         Consumer consumer = new DefaultConsumer(channel) {
@@ -111,7 +113,7 @@ public class SoapConsumer {
             public void handleDelivery(String consumerTag, Envelope envelope,
                                      AMQP.BasicProperties properties, byte[] body) throws IOException {
                 String message = new String(body, "UTF-8");
-                System.out.println(" [x] Received '" + envelope.getRoutingKey() + "':'" + message + "'");
+                lg.log(Level.INFO, "[" + id + "] received : " + envelope.getRoutingKey() + "':'" + message + "'");
                 JSONObject obj;
                 try {
                     obj = (JSONObject) parser.parse(message);
@@ -158,12 +160,12 @@ public class SoapConsumer {
                             			setEndReceived(true);
                                     }
                             	} else {
-                            		System.out.println("[!] Last message was unreadable");
+                            		lg.log(Level.INFO, "[" + id + "] last message was unreadable : \'type\' has to be \'config\', \'go\' or \'end\'");
                             	}
                             }
                         }
                     } else {
-                        System.out.println("[!] Last message was unreadable");
+                    	lg.log(Level.INFO, "[" + id + "] last message was unreadable : \'type\' not found");
                     }
                 } catch (ParseException ex) {
                         Logger.getLogger(SoapConsumer.class.getName()).log(Level.SEVERE, null, ex);
@@ -188,7 +190,7 @@ public class SoapConsumer {
         this.soapConnection = soapFactory.createConnection();
 
         //sleep waiting for the starting time
-        System.out.println("Starting time : Sleep for " + this.startingTime + " ms\n");
+        lg.log(Level.INFO, "[" + id + "] sleep for " + this.startingTime + " ms : starting delay" );
         Thread.sleep(startingTime);
 
         
@@ -205,31 +207,30 @@ public class SoapConsumer {
             received.put("id", this.id + "-" + cpt);
 
             // Process the SOAP Response
-            SoapMessageCreator.printSOAPResponse(soapResponse);
+            //SoapMessageCreator.printSOAPResponse(soapResponse);
             NodeList listReturn = soapResponse.getSOAPBody().getElementsByTagName("return");
             if(listReturn.getLength() != 0) {
                 Base64 decoder = new Base64();
             	byte[] result = decoder.decode(listReturn.item(0).getTextContent());
             	//byte[] result = listReturn.item(0).getTextContent().getBytes("UTF-8");
-            	System.out.println("\nNumber of bytes received : " + result.length);
+            	lg.log(Level.INFO, "[" + id + "] number of bytes received : " + result.length);
                 received.put("time", String.valueOf(time2 - time4));
 
             } else {
-            	System.out.println("\nThe request returned a fault");
+            	lg.log(Level.INFO, "[" + id + "] the last request returned a fault");
             	this.cptFails++;
             	received.put("time", "-1");
             	received.put("error", soapResponse.getSOAPBody().getTextContent());
             }
             this.listSent.add(sent);
             this.listReceived.add(received);
-            System.out.println("Delay of call : " + (time2 - time1) + " ms");
-            System.out.println("\nPeriod : Sleep for " + period + " ms");
+            lg.log(Level.INFO, "[" + id + "] delay of request : " + (time2 - time1) + " ms");
+            lg.log(Level.INFO, "[" + id + "] sleep for " + period + "ms : period");
             Thread.sleep(this.period);
             cpt++;
             time3 = System.currentTimeMillis();
         }
-
-        System.out.println("\nMission executed : " + cpt + " requests in " + (time3 - time4) + " ms ==> " + cptFails + " fails\n");
+        lg.log(Level.INFO, "[" + id + "] mission executed : " + cpt + " requests in " + (time3 - time4) + " ms ==> " + cptFails + " fails");
         doCallback();
     }
 
@@ -247,7 +248,7 @@ public class SoapConsumer {
     //Disconnect soapConnection and queueConnection
     private void disconnectEverything() {
         try {
-        	System.out.println("\nDisconnecting soap & rabbitmq");
+        	lg.log(Level.INFO, "[" + id + "] bye bye : disconnecting soap & rabbitmq");
         	if(this.soapConnection != null)
         		this.soapConnection.close();
         	if(this.queueConnection != null)
